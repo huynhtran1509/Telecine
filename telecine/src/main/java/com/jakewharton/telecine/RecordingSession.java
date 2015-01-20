@@ -5,8 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.hardware.display.VirtualDisplay;
+import android.media.CamcorderProfile;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
@@ -157,16 +159,38 @@ final class RecordingSession {
     Timber.d("Video size: %s%%", sizePercentage);
 
     DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-    int displayHeight = displayMetrics.heightPixels * sizePercentage / 100;
-    int displayWidth = displayMetrics.widthPixels * sizePercentage / 100;
-    int displayDpi = displayMetrics.densityDpi;
+    Configuration configuration = context.getResources().getConfiguration();
+
+    int maximumWidth;
+    int maximumHeight;
+
+    // Get the best camera profile available. We assume MediaRecorder supports the highest.
+    CamcorderProfile camcorderProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+    if (camcorderProfile != null) {
+      boolean isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE;
+      int frameWidth = camcorderProfile.videoFrameWidth;
+      int frameHeight = camcorderProfile.videoFrameHeight;
+      maximumWidth = isLandscape ? frameWidth : frameHeight;
+      maximumHeight = isLandscape ? frameHeight : frameWidth;
+    } else {
+      // No cameras. Fall back to the display size.
+      maximumWidth = displayMetrics.widthPixels;
+      maximumHeight = displayMetrics.heightPixels;
+    }
+
+    Timber.d("Maximum video dimensions, width: %s, height: %s", maximumWidth, maximumHeight);
+
+    int videoHeight = maximumHeight * sizePercentage / 100;
+    int videoWidth = maximumWidth * sizePercentage / 100;
+    int videoDpi = displayMetrics.densityDpi;
+    Timber.d("Final video dimensions, width: %s, height: %s", videoWidth, videoHeight);
 
     recorder = new MediaRecorder();
     recorder.setVideoSource(SURFACE);
     recorder.setOutputFormat(MPEG_4);
     recorder.setVideoFrameRate(30);
     recorder.setVideoEncoder(H264);
-    recorder.setVideoSize(displayWidth, displayHeight);
+    recorder.setVideoSize(videoWidth, videoHeight);
     recorder.setVideoEncodingBitRate(8 * 1000 * 1000);
 
     String outputName = fileFormat.format(new Date());
@@ -183,7 +207,7 @@ final class RecordingSession {
     projection = projectionManager.getMediaProjection(resultCode, data);
 
     Surface surface = recorder.getSurface();
-    display = projection.createVirtualDisplay(DISPLAY_NAME, displayWidth, displayHeight, displayDpi,
+    display = projection.createVirtualDisplay(DISPLAY_NAME, videoWidth, videoHeight, videoDpi,
         VIRTUAL_DISPLAY_FLAG_PRESENTATION, surface, null, null);
 
     recorder.start();
