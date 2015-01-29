@@ -162,9 +162,12 @@ final class RecordingSession {
     int displayDpi = displayMetrics.densityDpi;
 
     recorder = new MediaRecorder();
+    recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
     recorder.setVideoSource(SURFACE);
     recorder.setOutputFormat(MPEG_4);
+    recorder.setAudioEncodingBitRate(44100);
     recorder.setVideoFrameRate(30);
+    recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
     recorder.setVideoEncoder(H264);
     recorder.setVideoSize(displayWidth, displayHeight);
     recorder.setVideoEncodingBitRate(8 * 1000 * 1000);
