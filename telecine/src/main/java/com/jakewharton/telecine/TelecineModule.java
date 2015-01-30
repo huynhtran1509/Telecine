@@ -21,6 +21,7 @@ final class TelecineModule {
   private static final String PREFERENCES_NAME = "telecine";
   private static final boolean DEFAULT_SHOW_COUNTDOWN = true;
   private static final boolean DEFAULT_HIDE_FROM_RECENTS = false;
+  private static final boolean DEFAULT_RECORD_WITH_AUDIO = false;
   private static final int DEFAULT_VIDEO_SIZE_PERCENTAGE = 100;
 
   private final TelecineApplication app;
@@ -62,6 +63,15 @@ final class TelecineModule {
     return new BooleanPreference(prefs, "hide-from-recents", DEFAULT_HIDE_FROM_RECENTS);
   }
 
+  @Provides @Singleton @RecordWithAudio BooleanPreference provideRecordWithAudioPreference(
+      SharedPreferences prefs) {
+    return new BooleanPreference(prefs, "record-with-audio", DEFAULT_RECORD_WITH_AUDIO);
+  }
+
+  @Provides @RecordWithAudio Boolean provideRecordWithAudio(@RecordWithAudio BooleanPreference pref) {
+    return pref.get();
+  }
+    
   @Provides @Singleton @VideoSizePercentage IntPreference provideVideoSizePercentagePreference(
       SharedPreferences prefs) {
     return new IntPreference(prefs, "video-size", DEFAULT_VIDEO_SIZE_PERCENTAGE);

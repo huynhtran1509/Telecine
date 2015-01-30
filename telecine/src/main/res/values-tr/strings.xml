@@ -12,4 +12,8 @@
     <string name="countdown">3 saniyelik geri sayım</string>
     <string name="recents_hide">Son uygulamalardan gizle</string>
     <string name="video_size_percentage">Video boyutu</string>
+    <string name="record_with_audio">Sesli Kayıt</string>
+    <string name="notify_record_captured_title">Ekran kaydı yakalanan.</string>
+    <string name="notify_record_captured_subtitle">Ekran Kaydı görüntülemek için dokunun.</string>
+    <string name="notify_record_captured_action_title">pay</string>
 </resources>
