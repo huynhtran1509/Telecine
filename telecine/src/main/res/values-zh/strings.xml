@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string name="shortcut_name">Launch Debug</string>
+  <string name="clear">取消</string>
+  <string name="record">录制</string>
+  <string name="countdown_one">1…</string>
+  <string name="countdown_two">2…</string>
+  <string name="countdown_three">3…</string>
+  <string name="launch_overlay">开始录制</string>
+  <string name="preferences">设置</string>
+  <string name="countdown">3秒倒计时</string>
+  <string name="recents_hide">从最近运行的应用程序列表中隐藏</string>
+  <string name="video_size_percentage">视频压缩比</string>
+  <string name="record_with_audio">录制声音</string>
+  <string name="notify_record_captured_title">屏幕录制完成</string>
+  <string name="notify_record_captured_subtitle">点击这里查看录制的视频</string>
+  <string name="notify_record_captured_action_title">分享</string>
+</resources>

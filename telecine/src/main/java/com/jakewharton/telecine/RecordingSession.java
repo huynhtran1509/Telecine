@@ -63,6 +63,7 @@ final class RecordingSession {
   private final Analytics analytics;
   private final Provider<Boolean> showCountDown;
   private final Provider<Integer> videoSizePercentage;
+  private final Provider<Boolean> recordAudioPercentage;
 
   private final File outputRoot;
   private final DateFormat fileFormat =
@@ -81,7 +82,8 @@ final class RecordingSession {
   private long recordingStartNanos;
 
   RecordingSession(Context context, Listener listener, int resultCode, Intent data,
-      Analytics analytics, Provider<Boolean> showCountDown, Provider<Integer> videoSizePercentage) {
+      Analytics analytics, Provider<Boolean> showCountDown, Provider<Integer> videoSizePercentage,
+      Provider<Boolean> recordAudioPercentage) {
     this.context = context;
     this.listener = listener;
     this.resultCode = resultCode;
@@ -90,6 +92,7 @@ final class RecordingSession {
 
     this.showCountDown = showCountDown;
     this.videoSizePercentage = videoSizePercentage;
+    this.recordAudioPercentage = recordAudioPercentage;
 
     File picturesDir = Environment.getExternalStoragePublicDirectory(DIRECTORY_MOVIES);
     outputRoot = new File(picturesDir, "Telecine");
@@ -156,21 +159,15 @@ final class RecordingSession {
     int sizePercentage = videoSizePercentage.get();
     Timber.d("Video size: %s%%", sizePercentage);
 
+    boolean audioPercentage = recordAudioPercentage.get();
+    Timber.d("Record audio: %s", audioPercentage);
+
     DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
     int displayHeight = displayMetrics.heightPixels * sizePercentage / 100;
     int displayWidth = displayMetrics.widthPixels * sizePercentage / 100;
     int displayDpi = displayMetrics.densityDpi;
 
-    recorder = new MediaRecorder();
-    recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-    recorder.setVideoSource(SURFACE);
-    recorder.setOutputFormat(MPEG_4);
-    recorder.setAudioEncodingBitRate(44100);
-    recorder.setVideoFrameRate(30);
-    recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-    recorder.setVideoEncoder(H264);
-    recorder.setVideoSize(displayWidth, displayHeight);
-    recorder.setVideoEncodingBitRate(8 * 1000 * 1000);
+    recorder = createMediaRecorder(displayWidth, displayHeight, audioPercentage);
 
     String outputName = fileFormat.format(new Date());
     outputFile = new File(outputRoot, outputName).getAbsolutePath();
@@ -256,8 +253,8 @@ final class RecordingSession {
     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
     PendingIntent pendingShareIntent = PendingIntent.getActivity(context, 0, shareIntent, 0);
 
-    String title = "Screen recording captured.";
-    String subtitle = "Touch to view your screen recording.";
+    String title = context.getString(R.string.notify_record_captured_title);
+    String subtitle = context.getString(R.string.notify_record_captured_subtitle);
     Notification.Builder builder = new Notification.Builder(context) //
         .setContentTitle(title)
         .setContentText(subtitle)
@@ -267,7 +264,7 @@ final class RecordingSession {
         .setColor(context.getResources().getColor(R.color.primary_normal))
         .setContentIntent(pendingViewIntent)
         .setAutoCancel(true)
-        .addAction(R.drawable.ic_share_white_24dp, "Share", pendingShareIntent);
+        .addAction(R.drawable.ic_share_white_24dp, context.getString(R.string.notify_record_captured_action_title), pendingShareIntent);
 
     if (bitmap != null) {
       builder.setLargeIcon(createSquareBitmap(bitmap)) //
@@ -300,6 +297,24 @@ final class RecordingSession {
       }
     }.execute();
   }
+
+    private MediaRecorder createMediaRecorder(int displayWidth, int displayHeight, boolean recordAudio) {
+        MediaRecorder recorder = new MediaRecorder();
+        if (recordAudio) {
+            recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        }
+        recorder.setVideoSource(SURFACE);
+        recorder.setOutputFormat(MPEG_4);
+        if (recordAudio) {
+            recorder.setAudioEncodingBitRate(44100);
+            recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+        }
+        recorder.setVideoFrameRate(30);
+        recorder.setVideoEncoder(H264);
+        recorder.setVideoSize(displayWidth, displayHeight);
+        recorder.setVideoEncodingBitRate(8 * 1000 * 1000);
+        return recorder;
+    }
 
   private static Bitmap createSquareBitmap(Bitmap bitmap) {
     int x = 0;
