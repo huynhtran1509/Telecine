@@ -12,4 +12,8 @@
   <string name="countdown">Trzysekundowe odliczanie</string>
   <string name="recents_hide">Nie pokazuj w ostatnio użytych aplikacjach</string>
   <string name="video_size_percentage">Rozmiar nagrania</string>
+  <string name="record_with_audio">Nagrywanie z dźwiękiem</string>
+  <string name="notify_record_captured_title">Zdobyte nagrywanie ekranu.</string>
+  <string name="notify_record_captured_subtitle">Dotknij, aby wyświetlić nagrywanie ekranu.</string>
+  <string name="notify_record_captured_action_title">udział</string>
 </resources>

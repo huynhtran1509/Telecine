@@ -15,4 +15,8 @@
   <string name="countdown">Three second countdown</string>
   <string name="recents_hide">Hide from recent apps</string>
   <string name="video_size_percentage">Video size</string>
+  <string name="record_with_audio">Record with audio</string>
+  <string name="notify_record_captured_title">Screen recording captured.</string>
+  <string name="notify_record_captured_subtitle">Touch to view your screen recording.</string>
+  <string name="notify_record_captured_action_title">Share</string>
 </resources>

@@ -22,6 +22,7 @@ public final class TelecineService extends Service {
 
   @Inject @ShowCountdown Provider<Boolean> showCountdownProvider;
   @Inject @VideoSizePercentage Provider<Integer> videoSizePercentageProvider;
+  @Inject @RecordWithAudio Provider<Boolean> recordWithAudioProvider;
 
   @Inject Analytics analytics;
 
@@ -53,7 +54,7 @@ public final class TelecineService extends Service {
 
     recordingSession =
         new RecordingSession(this, listener, resultCode, data, analytics, showCountdownProvider,
-            videoSizePercentageProvider);
+            videoSizePercentageProvider, recordWithAudioProvider);
     recordingSession.showOverlay();
 
     return START_NOT_STICKY;
